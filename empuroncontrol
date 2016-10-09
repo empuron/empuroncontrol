@@ -1,0 +1,80 @@
+#!/bin/env python
+
+# Gib CPU und RAM Benutzung aus
+
+import sys
+import subprocess as sb
+
+class farben:
+	ROT = '\033[31;1m'
+	GRUEN = '\033[32;1m'
+	GELB = '\033[33;1m'
+	BLAU = '\033[34;1m'
+	STANDARD = '\033[0m'
+
+farben_auswahl = {1 : farben.BLAU,
+		  2 : farben.ROT,
+		  3 : farben.GRUEN,
+		  4 : farben.GELB, 
+		}
+
+funktionen = ['CpuRamUsage']
+
+# separator() Anfang
+def separator():
+	print("#################################")
+# separator() Ende
+
+# CpuRamUsage() Anfang
+def CpuRamUsage():
+
+	# Fuehre Shell Kommando aus und speichere in liste ######
+	testp = sb.Popen(['ps', '-aux']	, stdout=sb.PIPE	#
+				, stderr=sb.PIPE)		#
+								#
+	ausgabe, fehler = testp.communicate()			#
+	liste = [x.strip() for x in ausgabe.split('\n')]	#
+
+
+	# Treffe Auswahl, fuer CPU oder RAM ############################################# 
+	auswahl = raw_input("Systeminformation zu welchem Wert:\n[CPU=0] | [RAM=1]\n")	#
+	if auswahl == str(0):								#
+		spalte = 2								#
+		text = "CPU"								#
+	elif auswahl == str(1):								#
+		spalte = 3								#
+		text = "RAM"								#
+	else:										#
+		print("Keine ordentliche Eingabe")					#
+		return 1								#
+
+	# Je nach Wahl, jetzt die einzelnen Eintraege pro Teilliste in
+	# ausgewaehlter Spalte zusammen rechnen und ausgeben ############################
+	start = 0									#
+	summe = 0.0									#
+	for teilstring in liste:							#
+		teilliste = filter(lambda ende: ende != '', teilstring.split(' '))	#
+		start += 1								#
+		if start > 1:								#
+		# Gehe 'Out of Index' Probleme aus dem Weg 				#
+			if len(teilliste) >= spalte:					#
+				summe += float(teilliste[spalte])			#
+											#
+	print(text + " Verbrauch liegt bei "  + str(summe) + "%")			#
+		
+	return 0
+# CpuRamUsage() Ende
+
+# Hauptprogramm
+if __name__ == '__main__':	
+	print("-> Auswahl an Funktionen: ")
+	print("--> [1] CpuRamUsage()")
+	print(farben.GELB)
+	option = raw_input("==> ")
+	print(farben.BLAU)
+	separator()
+	print(farben.STANDARD)
+	if option == str(1):
+		CpuRamUsage()
+	else:
+		print "Nicht verfuegbar"
